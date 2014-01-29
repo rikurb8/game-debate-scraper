@@ -90,9 +90,6 @@ class Scraper:
         datedatas = dates.findAll("div", "gdateData")
 
         counter = 0
-
-        #read the found titles, and store possible found dates. last elif is just for misc release results the page
-        #has sometimes eg. "cancelled?"
         for title in titles:
 
             if "EU" in title.text:
@@ -110,6 +107,7 @@ class Scraper:
                      self.datastorage["AUrelease"] = '-'
             elif title.text.strip() != "":
 
+                #this is just for testing. we store the year in USRelease, and the actual title in EURelease
                 self.datastorage["OTHERrelease"] += self.format_date( title.text.strip() )
                 self.datastorage["OTHERrelease"] += self.format_date( datedatas[counter].text.strip() )
 
@@ -118,7 +116,6 @@ class Scraper:
 
     def get_genre_theme(self):
 
-        #find the propper container, and see if theres a genre and theme to be collected
         info_wrapper = self.soup.find("div", "g_wrapper")
         genre_divs = info_wrapper.findAll("div", "genre")
 
@@ -149,7 +146,7 @@ class Scraper:
         else:
             print self.url
 
-        #we get the actual rows, and start collecting the data, and storing them in .datastorage
+
         rows = req_column.findAll("div", recursive=False)
 
         row_counter = 0
@@ -199,6 +196,9 @@ class Scraper:
 
             #ram
             elif row_counter == 3:
+
+
+
                 try:
                     spec = row.find("div", "systemRequirementsRamContent")
                     spec = spec.find('span').text
@@ -219,6 +219,7 @@ class Scraper:
                     pass
 
             elif row_counter == 5:
+
                 try:
                     spec = row.find("span").text
                     self.datastorage["DX"+str(req_number)] = spec.strip()
@@ -227,6 +228,7 @@ class Scraper:
                     pass
 
             elif row_counter == 6:
+
                 try:
                     spec = row.find("span").text
                     self.datastorage["HDD"+str(req_number)] = spec.strip()
@@ -259,12 +261,23 @@ class Scraper:
         #since there was a OuterBox, we have atleast some sp
         req_columns = spec_box.findAll("div", "systemRequirementsWrapBox gameSystemRequirementsWrapBox")
 
-
+        found_predictions = False
 
         for req_column in req_columns:
 
+            if "Predicted Requirements" in req_column.text:
+                found_predictions = True
+                print self.url
+
+
             self.read_column(req_column)
 
+
+
+        if found_predictions:
+            return True
+        else:
+            return False
 
     #do the actual scraping
     def get_pageinfo(self):
@@ -292,7 +305,10 @@ class Scraper:
         self.get_genre_theme()
 
         #now the actual specs
-        self.get_requirements()
+        new = self.get_requirements()
+
+        if not new:
+            return None
 
         #after all the info is in the datastorage[] dictionary, we write it to a single string and return
         return self.info_to_string()
@@ -310,11 +326,11 @@ if __name__ == "__main__":
     baseurl = "http://www.game-debate.com/games/index.php?g_id="
 
     #modifie the starting id if you need the restart the program from a different location. eg. after a crash
-    starting_id = 5024
+    starting_id = 2636
 
     #the file we are gonna write the gotten info, the file has the starting_id in it, in case starting
     #from somewhere else than the begining.
-    output_file = "game-debate_starting_from{0}.csv".format(str(starting_id))
+    output_file = "game_debate_predicted_2.csv"
     output = open(output_file, 'w')
 
     #write the column header line in to the file if we are starting from the beggining
@@ -333,12 +349,13 @@ if __name__ == "__main__":
 
     print "ID: ", str(starting_id), " ", datetime.datetime.now()
 
+    input_file = open("log_final.txt", 'r')
 
     #loop the games from starting_id to end.
-    for i in range(starting_id, 7350):
+    for line in input_file:
 
         #get the page, BS it, and get the pageinfo
-        page_to_get = Scraper(baseurl+str(starting_id))
+        page_to_get = Scraper(line.strip())
         page_info = page_to_get.get_pageinfo()
 
         #if we didnt get anything back (no info etc), we skip the writing
@@ -351,7 +368,7 @@ if __name__ == "__main__":
         output.write("\n")
 
         #be nice, the longer the better
-        sleep(3)
+        sleep(1)
         starting_id += 1
 
 
