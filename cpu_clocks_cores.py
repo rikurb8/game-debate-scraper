@@ -4,14 +4,16 @@
 #rikujjs
 
 
+#some aftermath operations that had to be done to the data to make it more analysable. separating clocks and cores etc.
+#more data editing scripts to come.
+
+
+
+
 column_headers = ["ID", "Title", "EUrelease", "USrelease", "AUrelease", "Genre", "Theme", #6 täs rivillä
                   "INTELCPU1CLK","INTELCPU1CORES","INTELCPU1", "AMDCPU1CLK","AMDCPU1CORE","AMDCPU1", "NVIDIAGPU1","NVIDIAGPU1MEMORY", "AMDGPU1","AMDGPU1MEMORY", "RAM1", "OS1", "DX1", "HDD1",
                   "INTELCPU2CLK","INTELCPU2CORES","INTELCPU2", "AMDCPU2CLK","AMDCPU2CORE","AMDCPU2", "NVIDIAGPU2","NVIDIAGPU2MEMORY", "AMDGPU2","AMDGPU2MEMORY", "RAM2", "OS2", "DX2", "HDD2",
                   "INTELCPU3CLK","INTELCPU3CORES","INTELCPU3", "AMDCPU3CLK","AMDCPU3CORE","AMDCPU3", "NVIDIAGPU3","NVIDIAGPU3MEMORY", "AMDGPU3","AMDGPU3MEMORY", "RAM3", "OS3", "DX3", "HDD3"]
-
-                    #13 nvidiagpu1
-                    #27 nvidiagpu2
-                    #41 nvidiagpu3
 
 def edit(game):
 
@@ -41,14 +43,14 @@ if __name__ == "__main__":
 
         game = line.split(';')
 
-        #nvidia1 muistit
+        #nvidia1 memory
         if "MB" in game[column]:
             words = game[column].split(" ")
             for word in words:
                 if "MB" in word:
                     game[column+1] = word.replace("MB", "").strip()
 
-        #amd1 muistit
+        #amd1 memory
         if "MB" in game[column+2]:
             words = game[column+2].split(" ")
             for word in words:
@@ -88,38 +90,20 @@ if __name__ == "__main__":
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-#------------------- MUIDEN ALUSTOJEN PASKAT POIS
+#------------------- remove possible other platform products
         if "Blackberry" in game[1] and "[PC]" not in game[1]:
             counter += 1
             continue
             print line
 
 
-
- #       counter += 1
-
-
-#-------------------------------EI MUOKKAUSTA TÄN JÄLKEE-----------------------------------------------------
+#-------------------------------no edits after this line, writing back to file-----------------------------------------
         out_text = ""
         for line in game:
             out_text += ';'
             out_text += line.strip()
 
         out_text = out_text.replace(";", "", 1)
-        #out_text += ";"
-        #out_text += speed
         out_text += '\n'
 
         destination.write(out_text)
