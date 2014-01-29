@@ -8,3 +8,5 @@ the scraper crawls through all the games found on the page, and collects gameinf
 i'm adding dataediting (making the collected info more analyzable) scripts as i proceed.
 
 thanks!
+
+r
