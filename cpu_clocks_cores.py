@@ -65,6 +65,7 @@ if __name__ == "__main__":
                 if "MB" in word:
                     game[28] = word.replace("MB", "").strip()
 
+
         #amd2
         if "MB" in game[29]:
             words = game[29].split(" ")
